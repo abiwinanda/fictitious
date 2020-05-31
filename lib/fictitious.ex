@@ -48,7 +48,7 @@ defmodule Fictitious do
         use Ecto.Schema
         import Ecto.Changeset
 
-        schema "users" do
+        schema "persons" do
           field :name, :string
           field :age, :integer
           field :email, :string
@@ -63,7 +63,7 @@ defmodule Fictitious do
 
       iex> Fictitious.fictionize(YourApp.Schema.Person)
       {:ok, %YourApp.Schema.Person{
-        __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+        __meta__: #Ecto.Schema.Metadata<:loaded, "persons">,
         id: 35,
         name: "2cBfxcqnB0B5iqhYvK83RamaDa8KM0PvPpT1kVao",
         age: 514,
@@ -80,7 +80,7 @@ defmodule Fictitious do
 
       iex> Fictitious.fictionize(YourApp.Schema.Person, name: "some name", email: "some email")
       {:ok, %YourApp.Schema.Person{
-        __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+        __meta__: #Ecto.Schema.Metadata<:loaded, "persons">,
         id: 652,
         name: "some name",
         age: 1241,
@@ -91,14 +91,14 @@ defmodule Fictitious do
 
   ### Schema with Changeset Validations
 
-  The previous schema in `Basics` section was a rather simple schema. What happen if we now decided to modify the `users` schema
+  The previous schema in `Basics` section was a rather simple schema. What happen if we now decided to modify the `persons` schema
   to add some field value validations in the `changeset/2` function as follow:
 
       defmodule YourApp.Schema.Person do
         use Ecto.Schema
         import Ecto.Changeset
 
-        schema "users" do
+        schema "persons" do
           field :name, :string
           field :age, :integer
           field :gender, :string
@@ -117,12 +117,12 @@ defmodule Fictitious do
       end
 
   Having `validate_inclusion/3` and `validate_email_format/1` in the changeset would make the value of `:gender` and `:email` to be totally random hence
-  `Fictitious` will ignore any kind of validation in the changeset. Performing `fictionize/1` function to the new `users` schema will still give you a
+  `Fictitious` will ignore any kind of validation in the changeset. Performing `fictionize/1` function to the new `persons` schema will still give you a
   fictitious value for `:gender` and `:email`:
 
       iex> Fictitious.fictionize(YourApp.Schema.Person)
       {:ok, %YourApp.Schema.Person{
-        __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+        __meta__: #Ecto.Schema.Metadata<:loaded, "persons">,
         id: 1243,
         name: "2cBfxcqnB0B5iqhYvK83RamaDa8KM0PvPpT1kVao",
         age: 632,
@@ -136,7 +136,7 @@ defmodule Fictitious do
 
       iex> Fictitious.fictionize(YourApp.Schema.Person, gender: "MALE", email: "email@domain.com")
       {:ok, %YourApp.Schema.Person{
-        __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+        __meta__: #Ecto.Schema.Metadata<:loaded, "persons">,
         id: 564545,
         name: "xIzommg1lpwgRNBQCcGXLXdxORM7gXGqVIkC3gDL2As1DhxmhdejE0tXR2ImlrXN7j72nDO3Y",
         age: 235111,
@@ -173,7 +173,7 @@ defmodule Fictitious do
         import Ecto.Changeset
         alias YourApp.Schema.Country
 
-        schema "users" do
+        schema "persons" do
           field :name, :string
           field :age, :integer
           field :gender, :string
@@ -205,7 +205,7 @@ defmodule Fictitious do
 
       iex> {:ok, person} = Fictitious.fictionize(YourApp.Schema.Person)
       {:ok, %YourApp.Schema.Person{
-        __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+        __meta__: #Ecto.Schema.Metadata<:loaded, "persons">,
         id: 725,
         name: "bElHKj9zVwnkLRpO4Y23yon9n80gm1yeAEL4PgtgkxBc0p2Y7C",
         age: 364,
@@ -218,7 +218,7 @@ defmodule Fictitious do
 
       iex> YourApp.Repo.preload(person, :nationality)
       %YourApp.Schema.Person{
-        __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+        __meta__: #Ecto.Schema.Metadata<:loaded, "persons">,
         id: 725,
         name: "bElHKj9zVwnkLRpO4Y23yon9n80gm1yeAEL4PgtgkxBc0p2Y7C",
         age: 364,
@@ -255,7 +255,7 @@ defmodule Fictitious do
 
       iex> {:ok, person} = Fictitious.fictionize(YourApp.Schema.Person, country_id: country.id)
       {:ok, %YourApp.Schema.Person{
-        __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+        __meta__: #Ecto.Schema.Metadata<:loaded, "persons">,
         id: 5230,
         name: "FZcb5Q4zLOO4aMrdi1RblsEPpushgAn9zoPtfMbJWlsNe",
         age: 5768,
@@ -280,7 +280,7 @@ defmodule Fictitious do
 
       iex> {:ok, person} = Fictitious.fictionize(YourApp.Schema.Person, nationality: country)
       {:ok, %YourApp.Schema.Person{
-        __meta__: #Ecto.Schema.Metadata<:loaded, "users">,
+        __meta__: #Ecto.Schema.Metadata<:loaded, "persons">,
         id: 451,
         name: "ZFvtidsGOPh6OymYJk529bL2QT9KMZic2A0ietddl2RWy",
         age: 150940,
