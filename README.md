@@ -172,7 +172,7 @@ you have the following new `countries` schema as follow:
 ```elixir
 defmodule YourApp.Schema.Country do
   use Ecto.Schema
-  import Ecto.Changese
+  import Ecto.Changeset
   alias YourApp.Schema.Person
 
   schema "countries" do

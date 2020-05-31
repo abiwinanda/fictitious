@@ -153,7 +153,7 @@ defmodule Fictitious do
 
       defmodule YourApp.Schema.Country do
         use Ecto.Schema
-        import Ecto.Changese
+        import Ecto.Changeset
         alias YourApp.Schema.Person
 
         schema "countries" do
