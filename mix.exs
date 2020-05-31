@@ -25,6 +25,8 @@ defmodule Fictitious.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:ecto, "~> 3.1"},
+      {:ecto_sql, "~> 3.1"},
       {:misc_random, "~> 0.2.9"},
       {:ex_doc, "~> 0.22.0", only: :dev, runtime: false}
     ]
@@ -37,8 +39,12 @@ defmodule Fictitious.MixProject do
   defp package() do
     [
       # These are the default files included in the package
-      files: ~w(lib priv .formatter.exs mix.exs README* readme* LICENSE*
-                license* CHANGELOG* changelog* src),
+      files: [
+        "lib",
+        "mix.exs",
+        "README.md",
+        ".formatter.exs"
+      ],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/abiwinanda/fictitious"}
     ]
