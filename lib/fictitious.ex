@@ -8,12 +8,12 @@ defmodule Fictitious do
 
   `Fictitious` only generates fictitious data hence it is recommended that you install them in test environment
   only but feel free to play around with `Fictitious` by having it installed in normal dev environment.
-  Inside your `mix.exs` file add `{:fictitious, "~> 0.1.0", only: :test}` as one of your dependency:
+  Inside your `mix.exs` file add `{:fictitious, "~> 0.1.1", only: :test}` as one of your dependency:
 
       defp deps do
         [
           ...
-          {:fictitious, "~> 0.1.0", only: :test},
+          {:fictitious, "~> 0.1.1", only: :test},
           ...
         ]
       end
