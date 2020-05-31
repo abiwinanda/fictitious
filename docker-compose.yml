@@ -1,0 +1,17 @@
+# Version of docker-compose
+version: '3'
+
+# Depedency services that need to be run
+services:
+
+  # Visit https://hub.docker.com/_/postgres for more information
+  db:
+    container_name: load_service_postgres
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: always
+    ports:
+      - "5432:5432"
