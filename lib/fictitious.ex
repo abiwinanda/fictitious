@@ -243,11 +243,11 @@ defmodule Fictitious do
   In case you want the created fictitious person to belongs to the previously created fictitious country then there are two ways you
   could do that. First is by manually changing the `:country_id` as follows:
 
-      iex> {:ok, country} = Fictitious.fictionize(YourApp.Schema.Country)
+      iex> {:ok, country} = Fictitious.fictionize(YourApp.Schema.Country, name: "Indonesia")
       {:ok, %YourApp.Schema.Country{
         __meta__: #Ecto.Schema.Metadata<:loaded, "countries">,
         id: 666409,
-        name: "PBFnUbyDokx2vRkPkabDATTc10782NoErPH2H82ZPgKGa",
+        name: "Indonesia",
         people: #Ecto.Association.NotLoaded<association :people is not loaded>,
         inserted_at: ~U[2020-04-31 06:19:27Z],
         updated_at: ~U[2020-04-31 06:19:27Z]
@@ -268,11 +268,11 @@ defmodule Fictitious do
 
   or second, by passing the whole `%YourApp.Schema.Country{}` struct as follows:
 
-      iex> {:ok, country} = Fictitious.fictionize(YourApp.Schema.Country)
+      iex> {:ok, country} = Fictitious.fictionize(YourApp.Schema.Country, name: "Indonesia")
       {:ok, %YourApp.Schema.Country{
         __meta__: #Ecto.Schema.Metadata<:loaded, "countries">,
         id: 7914,
-        name: "KZnSewzrsTUgKNuLFxW84f2D3vEgneyz7TdnDLVojcXy3",
+        name: "Indonesia",
         people: #Ecto.Association.NotLoaded<association :people is not loaded>,
         inserted_at: ~U[2020-04-31 06:19:27Z],
         updated_at: ~U[2020-04-31 06:19:27Z]
