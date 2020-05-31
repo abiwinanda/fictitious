@@ -1,7 +1,7 @@
 defmodule Fictitious.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [
@@ -22,7 +22,7 @@ defmodule Fictitious.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Fictitious.Application, []},
+      # mod: {Fictitious.Application, []},
       extra_applications: [:logger]
     ]
   end
@@ -48,9 +48,7 @@ defmodule Fictitious.MixProject do
       # These are the default files included in the package
       maintainers: ["Nyoman Abiwinanda"],
       files: [
-        "config/config.exs",
         "lib/fictitious.ex",
-        "lib/application.ex",
         "mix.exs",
         "LICENSE.md",
         "README.md",
