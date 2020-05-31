@@ -26,7 +26,9 @@ defmodule Fictitious.MixProject do
   defp deps do
     [
       {:ecto, "~> 3.1"},
+      {:ksuid, "~> 0.1.2"},
       {:ecto_sql, "~> 3.1"},
+      {:postgrex, "~> 0.15.1"},
       {:misc_random, "~> 0.2.9"},
       {:ex_doc, "~> 0.22.0", only: :dev, runtime: false}
     ]
