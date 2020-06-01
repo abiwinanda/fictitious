@@ -6,7 +6,7 @@ services:
 
   # Visit https://hub.docker.com/_/postgres for more information
   db:
-    container_name: load_service_postgres
+    container_name: fictitious_db
     image: postgres:12-alpine
     environment:
       POSTGRES_USER: postgres
