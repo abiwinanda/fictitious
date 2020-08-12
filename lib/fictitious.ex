@@ -313,12 +313,24 @@ defmodule Fictitious do
     end
   end
 
+  @spec fictionize(Ecto.Schema.t()) ::
+          {:ok, %{} | Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def fictionize(ecto_schema) do
     case ecto_schema do
-      %Ecto.Association.BelongsTo{related: parent_ecto_schema} -> fictionize(parent_ecto_schema)
+      %Ecto.Association.BelongsTo{related: parent_ecto_schema, owner: owner} ->
+        cond do
+          owner == parent_ecto_schema -> {:ok, %{}}
+          true -> fictionize(parent_ecto_schema)
+        end
+
       _ ->
         ecto_schema
-        |> fictitious_changeset(Map.merge(fictionize_independent_fields(ecto_schema), fictionize_belongs_to_association_fields(ecto_schema)))
+        |> fictitious_changeset(
+          Map.merge(
+            fictionize_independent_fields(ecto_schema),
+            fictionize_belongs_to_association_fields(ecto_schema)
+          )
+        )
         |> repo(:default).insert()
         |> case do
           {:ok, data} -> {:ok, data}
@@ -327,12 +339,24 @@ defmodule Fictitious do
     end
   end
 
+  @spec fictionize(Ecto.Schema.t(), nil | Atom.t() | Keyword.t()) ::
+          {:ok, %{} | Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def fictionize(ecto_schema, repo) when is_atom(repo) and not is_nil(repo) do
     case ecto_schema do
-      %Ecto.Association.BelongsTo{related: parent_ecto_schema} -> fictionize(parent_ecto_schema, repo)
+      %Ecto.Association.BelongsTo{related: parent_ecto_schema, owner: owner} ->
+        cond do
+          owner == parent_ecto_schema -> {:ok, %{}}
+          true -> fictionize(parent_ecto_schema, repo)
+        end
+
       _ ->
         ecto_schema
-        |> fictitious_changeset(Map.merge(fictionize_independent_fields(ecto_schema), fictionize_belongs_to_association_fields(ecto_schema, repo)))
+        |> fictitious_changeset(
+          Map.merge(
+            fictionize_independent_fields(ecto_schema),
+            fictionize_belongs_to_association_fields(ecto_schema, repo)
+          )
+        )
         |> repo(repo).insert()
         |> case do
           {:ok, data} -> {:ok, data}
@@ -351,7 +375,12 @@ defmodule Fictitious do
 
       _ ->
         ecto_schema
-        |> fictitious_changeset(Map.merge(fictionize_independent_fields(ecto_schema, opts), fictionize_belongs_to_association_fields(ecto_schema, opts)))
+        |> fictitious_changeset(
+          Map.merge(
+            fictionize_independent_fields(ecto_schema, opts),
+            fictionize_belongs_to_association_fields(ecto_schema, opts)
+          )
+        )
         |> repo(:default).insert()
         |> case do
           {:ok, data} -> {:ok, data}
@@ -360,6 +389,8 @@ defmodule Fictitious do
     end
   end
 
+  @spec fictionize(Ecto.Schema.t(), Atom.t(), nil | Keyword.t()) ::
+          {:ok, %{} | Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
   def fictionize(ecto_schema, repo, opts) when is_atom(repo) do
     case ecto_schema do
       %Ecto.Association.BelongsTo{related: parent_ecto_schema} ->
@@ -370,7 +401,12 @@ defmodule Fictitious do
 
       _ ->
         ecto_schema
-        |> fictitious_changeset(Map.merge(fictionize_independent_fields(ecto_schema, opts), fictionize_belongs_to_association_fields(ecto_schema, repo, opts)))
+        |> fictitious_changeset(
+          Map.merge(
+            fictionize_independent_fields(ecto_schema, opts),
+            fictionize_belongs_to_association_fields(ecto_schema, repo, opts)
+          )
+        )
         |> repo(repo).insert()
         |> case do
           {:ok, data} -> {:ok, data}
@@ -383,95 +419,172 @@ defmodule Fictitious do
   #           FICTIONIZER           #
   ###################################
 
-  defp fictitious_changeset(ecto_schema, attrs), do: cast(ecto_schema.__struct__, attrs, get_fields(ecto_schema))
-  defp fictionize_independent_field(ecto_schema, field), do: ecto_schema |> get_field_type(field) |> gen_random()
+  defp fictitious_changeset(ecto_schema, attrs),
+    do: cast(ecto_schema.__struct__, attrs, get_fields(ecto_schema))
+
+  # Fictionize if the field is an independent field (not an Ecto belongs to association fields)
+  defp fictionize_independent_field(ecto_schema, field),
+    do: ecto_schema |> get_field_type(field) |> gen_random()
+
+  # Fictionize all the independent fields within the ecto_schema
   defp fictionize_independent_fields(ecto_schema) do
     ecto_schema
     |> get_independent_fields()
-    |> Enum.reduce(%{}, fn field, acc -> Map.put(acc, field, fictionize_independent_field(ecto_schema, field)) end)
-
+    |> Enum.reduce(%{}, fn field, acc ->
+      Map.put(acc, field, fictionize_independent_field(ecto_schema, field))
+    end)
   end
-  defp fictionize_independent_fields(predefined_value_map, opts) when is_map(predefined_value_map) and is_list(opts), do: predefined_value_map |> Map.keys() |> Enum.reduce(%{}, fn key, acc -> Map.put(acc, key, Keyword.get(opts, key) || Map.get(predefined_value_map, key)) end)
-  defp fictionize_independent_fields(ecto_schema, opts) when is_list(opts), do: fictionize_independent_fields(fictionize_independent_fields(ecto_schema), opts)
-  defp fictionize_belongs_to_association_field(ecto_schema, field), do: ecto_schema |> get_association_field_type(field) |> fictionize()
-  defp fictionize_belongs_to_association_field(ecto_schema, field, opts) when is_list(opts), do: ecto_schema |> get_association_field_type(field) |> fictionize(Keyword.get(opts, field))
-  defp fictionize_belongs_to_association_field(ecto_schema, field, repo), do: ecto_schema |> get_association_field_type(field) |> fictionize(repo)
-  defp fictionize_belongs_to_association_field(ecto_schema, field, repo, opts) when is_list(opts), do: ecto_schema |> get_association_field_type(field) |> fictionize(repo, Keyword.get(opts, field))
+
+  defp fictionize_independent_fields(predefined_value_map, opts)
+       when is_map(predefined_value_map) and is_list(opts),
+       do:
+         predefined_value_map
+         |> Map.keys()
+         |> Enum.reduce(%{}, fn key, acc ->
+           Map.put(acc, key, Keyword.get(opts, key) || Map.get(predefined_value_map, key))
+         end)
+
+  defp fictionize_independent_fields(ecto_schema, opts) when is_list(opts),
+    do: fictionize_independent_fields(fictionize_independent_fields(ecto_schema), opts)
+
+  # Fictionize if the field is an Ecto belongs to association fields
+  defp fictionize_belongs_to_association_field(ecto_schema, field),
+    do: ecto_schema |> get_association_field_type(field) |> fictionize()
+
+  defp fictionize_belongs_to_association_field(ecto_schema, field, opts) when is_list(opts),
+    do: ecto_schema |> get_association_field_type(field) |> fictionize(Keyword.get(opts, field))
+
+  defp fictionize_belongs_to_association_field(ecto_schema, field, repo),
+    do: ecto_schema |> get_association_field_type(field) |> fictionize(repo)
+
+  defp fictionize_belongs_to_association_field(ecto_schema, field, repo, opts) when is_list(opts),
+    do:
+      ecto_schema
+      |> get_association_field_type(field)
+      |> fictionize(repo, Keyword.get(opts, field))
+
+  # Fictionize all the Ecto belongs to association fields
   defp fictionize_belongs_to_association_fields(ecto_schema) do
     ecto_schema
     |> get_belongs_to_association_fields()
     |> Enum.reduce(%{}, fn field, acc ->
-      Map.put(acc, get_association_field_key(ecto_schema, field),
+      Map.put(
+        acc,
+        get_association_field_key(ecto_schema, field),
         ecto_schema
         |> fictionize_belongs_to_association_field(field)
         |> detupelize()
-        |> Map.get(ecto_schema |> get_association_field_ecto_schema(field) |> get_primary_key_field())
+        |> Map.get(
+          ecto_schema
+          |> get_association_field_ecto_schema(field)
+          |> get_primary_key_field()
+        )
       )
     end)
   end
+
   defp fictionize_belongs_to_association_fields(ecto_schema, repo) when is_atom(repo) do
     ecto_schema
     |> get_belongs_to_association_fields()
     |> Enum.reduce(%{}, fn field, acc ->
-      Map.put(acc, get_association_field_key(ecto_schema, field),
+      Map.put(
+        acc,
+        get_association_field_key(ecto_schema, field),
         ecto_schema
         |> fictionize_belongs_to_association_field(field, repo)
         |> detupelize()
-        |> Map.get(ecto_schema |> get_association_field_ecto_schema(field) |> get_primary_key_field())
+        |> Map.get(
+          ecto_schema
+          |> get_association_field_ecto_schema(field)
+          |> get_primary_key_field()
+        )
       )
     end)
   end
+
   defp fictionize_belongs_to_association_fields(ecto_schema, opts) when is_list(opts) do
     ecto_schema
     |> get_belongs_to_association_fields()
     |> Enum.reduce(%{}, fn field, acc ->
       association_field_key = get_association_field_key(ecto_schema, field)
+
       association_field_value =
         cond do
           not is_nil(Keyword.get(opts, association_field_key)) ->
             Keyword.get(opts, association_field_key)
 
           is_map(Keyword.get(opts, field)) ->
-            association_ecto_schema = opts |> Keyword.get(field) |> Map.get(:__meta__) |> Map.get(:schema)
+            association_ecto_schema =
+              opts |> Keyword.get(field) |> Map.get(:__meta__) |> Map.get(:schema)
+
             primary_key = association_ecto_schema.__schema__(:primary_key) |> Enum.at(0)
-            opts |> Keyword.get(field) |> Map.from_struct() |> Map.to_list() |> Keyword.get(primary_key)
+
+            opts
+            |> Keyword.get(field)
+            |> Map.from_struct()
+            |> Map.to_list()
+            |> Keyword.get(primary_key)
 
           true ->
             nil
         end
 
-      Map.put(acc, association_field_key, association_field_value ||
-        ecto_schema
-        |> fictionize_belongs_to_association_field(field, opts)
-        |> detupelize()
-        |> Map.get(ecto_schema |> get_association_field_ecto_schema(field) |> get_primary_key_field())
+      Map.put(
+        acc,
+        association_field_key,
+        association_field_value ||
+          ecto_schema
+          |> fictionize_belongs_to_association_field(field, opts)
+          |> detupelize()
+          |> Map.get(
+            ecto_schema
+            |> get_association_field_ecto_schema(field)
+            |> get_primary_key_field()
+          )
       )
     end)
   end
-  defp fictionize_belongs_to_association_fields(ecto_schema, repo, opts) when is_atom(repo) and is_list(opts) do
+
+  defp fictionize_belongs_to_association_fields(ecto_schema, repo, opts)
+       when is_atom(repo) and is_list(opts) do
     ecto_schema
     |> get_belongs_to_association_fields()
     |> Enum.reduce(%{}, fn field, acc ->
       association_field_key = get_association_field_key(ecto_schema, field)
+
       association_field_value =
         cond do
           not is_nil(Keyword.get(opts, association_field_key)) ->
             Keyword.get(opts, association_field_key)
 
           is_map(Keyword.get(opts, field)) ->
-            association_ecto_schema = opts |> Keyword.get(field) |> Map.get(:__meta__) |> Map.get(:schema)
+            association_ecto_schema =
+              opts |> Keyword.get(field) |> Map.get(:__meta__) |> Map.get(:schema)
+
             primary_key = association_ecto_schema.__schema__(:primary_key) |> Enum.at(0)
-            opts |> Keyword.get(field) |> Map.from_struct() |> Map.to_list() |> Keyword.get(primary_key)
+
+            opts
+            |> Keyword.get(field)
+            |> Map.from_struct()
+            |> Map.to_list()
+            |> Keyword.get(primary_key)
 
           true ->
             nil
         end
 
-      Map.put(acc, association_field_key, association_field_value ||
-        ecto_schema
-        |> fictionize_belongs_to_association_field(field, repo, opts)
-        |> detupelize()
-        |> Map.get(ecto_schema |> get_association_field_ecto_schema(field) |> get_primary_key_field())
+      Map.put(
+        acc,
+        association_field_key,
+        association_field_value ||
+          ecto_schema
+          |> fictionize_belongs_to_association_field(field, repo, opts)
+          |> detupelize()
+          |> Map.get(
+            ecto_schema
+            |> get_association_field_ecto_schema(field)
+            |> get_primary_key_field()
+          )
       )
     end)
   end
@@ -484,15 +597,37 @@ defmodule Fictitious do
   defp get_fields(ecto_schema), do: ecto_schema.__schema__(:fields)
   defp get_field_type(ecto_schema, field), do: ecto_schema.__schema__(:type, field)
   defp get_any_association_fields(ecto_schema), do: ecto_schema.__schema__(:associations)
-  defp get_independent_fields(ecto_schema), do: ecto_schema |> get_fields() |> not_in(get_association_field_keys(ecto_schema))
-  defp get_belongs_to_association_fields(ecto_schema), do: ecto_schema |> get_any_association_fields() |> Enum.filter(fn field -> get_association_field_type(ecto_schema, field) |> is_belongs_to_association?() end)
-  defp get_association_field_type(ecto_schema, field), do: ecto_schema.__schema__(:association, field)
+
+  defp get_independent_fields(ecto_schema),
+    do: ecto_schema |> get_fields() |> not_in(get_association_field_keys(ecto_schema))
+
+  defp get_belongs_to_association_fields(ecto_schema),
+    do:
+      ecto_schema
+      |> get_any_association_fields()
+      |> Enum.filter(fn field ->
+        get_association_field_type(ecto_schema, field) |> is_belongs_to_association?()
+      end)
+
+  defp get_association_field_type(ecto_schema, field),
+    do: ecto_schema.__schema__(:association, field)
+
   defp get_association_field_key(%Ecto.Association.Has{related_key: key}), do: key
   defp get_association_field_key(%Ecto.Association.BelongsTo{owner_key: key}), do: key
   defp get_association_field_key(%Ecto.Association.ManyToMany{}), do: :not_supported_yet
-  defp get_association_field_key(ecto_schema, field), do: ecto_schema.__schema__(:association, field) |> get_association_field_key()
-  defp get_association_field_keys(ecto_schema), do: ecto_schema |> get_any_association_fields() |> Enum.map(fn field -> get_association_field_key(ecto_schema, field) end)
-  defp get_association_field_ecto_schema(ecto_schema, field), do: ecto_schema.__schema__(:association, field).related
+
+  defp get_association_field_key(ecto_schema, field),
+    do: ecto_schema.__schema__(:association, field) |> get_association_field_key()
+
+  defp get_association_field_keys(ecto_schema),
+    do:
+      ecto_schema
+      |> get_any_association_fields()
+      |> Enum.map(fn field -> get_association_field_key(ecto_schema, field) end)
+
+  defp get_association_field_ecto_schema(ecto_schema, field),
+    do: ecto_schema.__schema__(:association, field).related
+
   defp is_belongs_to_association?(%Ecto.Association.BelongsTo{}), do: true
   defp is_belongs_to_association?(_), do: false
 
@@ -526,5 +661,7 @@ defmodule Fictitious do
   ###################################
 
   defp detupelize({_status, data}), do: data
-  defp not_in(input_list, comparing_list), do: Enum.reject(input_list, fn field -> field in comparing_list end)
+
+  defp not_in(input_list, comparing_list),
+    do: Enum.reject(input_list, fn field -> field in comparing_list end)
 end
