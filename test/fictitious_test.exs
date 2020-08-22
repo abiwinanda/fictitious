@@ -67,7 +67,7 @@ defmodule FictitiousTest do
   end
 
   test "Fictitious does not generate two records to a self referencing schema when overriding some fields." do
-    {:ok, person} = Fictitious.fictionize(Person, name: "Poli")
+    Fictitious.fictionize(Person, name: "Poli")
     assert length(Fictitious.Repo.all(Person)) == 1
   end
 
@@ -76,8 +76,8 @@ defmodule FictitiousTest do
     assert is_nil(person.name)
   end
 
-  # test "Fictitious can give null value to a belongs to association field key." do
-  #   {:ok, person} = Fictitious.fictionize(Person, parent_id: :null)
-  #   assert is_nil(person.parent_id)
-  # end
+  test "Fictitious can give null value to a belongs to association field key." do
+    {:ok, person} = Fictitious.fictionize(Person, parent_id: :null)
+    assert is_nil(person.parent_id)
+  end
 end

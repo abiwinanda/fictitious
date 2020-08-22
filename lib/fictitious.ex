@@ -488,7 +488,7 @@ defmodule Fictitious do
     predefined_value_map
     |> Map.keys()
     |> Enum.reduce(%{}, fn key, acc ->
-      Map.put(acc, key, interpret_value(opts, predefined_value_map, key))
+      Map.put(acc, key, interpret_independent_value(opts, predefined_value_map, key))
     end)
   end
 
@@ -496,7 +496,7 @@ defmodule Fictitious do
     fictionize_independent_fields(fictionize_independent_fields(ecto_schema), opts)
   end
 
-  defp interpret_value(opts, predefined_value_map, key) do
+  defp interpret_independent_value(opts, predefined_value_map, key) do
     cond do
       Keyword.get(opts, key) == :null -> nil
       is_nil(Keyword.get(opts, key)) -> Map.get(predefined_value_map, key)
@@ -599,17 +599,34 @@ defmodule Fictitious do
       Map.put(
         acc,
         association_field_key,
-        association_field_value ||
-          ecto_schema
-          |> fictionize_belongs_to_association_field(field, opts)
-          |> detupelize()
-          |> Map.get(
-            ecto_schema
-            |> get_association_field_ecto_schema(field)
-            |> get_primary_key_field()
-          )
+        interpret_belongs_to_association_value(association_field_value, ecto_schema, field, opts)
       )
     end)
+  end
+
+  defp interpret_belongs_to_association_value(
+         association_field_value,
+         ecto_schema,
+         field,
+         opts
+       ) do
+    cond do
+      association_field_value == :null ->
+        nil
+
+      is_nil(association_field_value) ->
+        ecto_schema
+        |> fictionize_belongs_to_association_field(field, opts)
+        |> detupelize()
+        |> Map.get(
+          ecto_schema
+          |> get_association_field_ecto_schema(field)
+          |> get_primary_key_field()
+        )
+
+      true ->
+        association_field_value
+    end
   end
 
   defp fictionize_belongs_to_association_fields(ecto_schema, repo, opts)
@@ -643,17 +660,41 @@ defmodule Fictitious do
       Map.put(
         acc,
         association_field_key,
-        association_field_value ||
-          ecto_schema
-          |> fictionize_belongs_to_association_field(field, repo, opts)
-          |> detupelize()
-          |> Map.get(
-            ecto_schema
-            |> get_association_field_ecto_schema(field)
-            |> get_primary_key_field()
-          )
+        interpret_belongs_to_association_value(
+          association_field_value,
+          ecto_schema,
+          field,
+          repo,
+          opts
+        )
       )
     end)
+  end
+
+  defp interpret_belongs_to_association_value(
+         association_field_value,
+         ecto_schema,
+         field,
+         repo,
+         opts
+       ) do
+    cond do
+      association_field_value == :null ->
+        nil
+
+      is_nil(association_field_value) ->
+        ecto_schema
+        |> fictionize_belongs_to_association_field(field, repo, opts)
+        |> detupelize()
+        |> Map.get(
+          ecto_schema
+          |> get_association_field_ecto_schema(field)
+          |> get_primary_key_field()
+        )
+
+      true ->
+        association_field_value
+    end
   end
 
   ###################################
