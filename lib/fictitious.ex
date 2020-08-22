@@ -708,7 +708,7 @@ defmodule Fictitious do
   #   iex> get_fields(Person)
   #   [:id, :name, :age, :gender, :email, :country_id, :parent_id, :inserted_at, :updated_at]
   #
-  def get_fields(ecto_schema) do
+  defp get_fields(ecto_schema) do
     ecto_schema.__schema__(:fields)
   end
 
@@ -719,7 +719,7 @@ defmodule Fictitious do
   #   iex> get_primary_key_field(Person)
   #   :id
   #
-  def get_primary_key_field(ecto_schema) do
+  defp get_primary_key_field(ecto_schema) do
     :primary_key
     |> ecto_schema.__schema__()
     |> Enum.at(0)
@@ -735,7 +735,7 @@ defmodule Fictitious do
   #   iex> get_field_type(Person, :age)
   #   :integer
   #
-  def get_field_type(ecto_schema, field) do
+  defp get_field_type(ecto_schema, field) do
     ecto_schema.__schema__(:type, field)
   end
 
@@ -746,7 +746,7 @@ defmodule Fictitious do
   #   iex> get_independent_fields(Person)
   #   [:id, :name, :age, :gender, :email, :inserted_at, :updated_at]
   #
-  def get_independent_fields(ecto_schema) do
+  defp get_independent_fields(ecto_schema) do
     ecto_schema
     |> get_fields()
     |> not_in(get_association_field_keys(ecto_schema))
@@ -759,7 +759,7 @@ defmodule Fictitious do
   #   iex> get_any_association_fields(Person)
   #   [:nationality, :parent]
   #
-  def get_any_association_fields(ecto_schema) do
+  defp get_any_association_fields(ecto_schema) do
     ecto_schema.__schema__(:associations)
   end
 
@@ -770,7 +770,7 @@ defmodule Fictitious do
   #   iex> get_association_field_keys(Person)
   #   [:country_id, :parent_id]
   #
-  def get_association_field_keys(ecto_schema) do
+  defp get_association_field_keys(ecto_schema) do
     ecto_schema
     |> get_any_association_fields()
     |> Enum.map(fn field -> get_association_field_key(ecto_schema, field) end)
@@ -783,7 +783,7 @@ defmodule Fictitious do
   #   iex> get_belongs_to_association_fields(Person)
   #   [:nationality, :parent]
   #
-  def get_belongs_to_association_fields(ecto_schema) do
+  defp get_belongs_to_association_fields(ecto_schema) do
     ecto_schema
     |> get_any_association_fields()
     |> Enum.filter(fn field ->
@@ -803,7 +803,7 @@ defmodule Fictitious do
   #   iex> get_association_field_type(Person, :name)
   #   nil
   #
-  def get_association_field_type(ecto_schema, field) do
+  defp get_association_field_type(ecto_schema, field) do
     ecto_schema.__schema__(:association, field)
   end
 
@@ -817,15 +817,15 @@ defmodule Fictitious do
   #   iex> get_association_field_key(Person, :parent)
   #   :parent_id
   #
-  def get_association_field_key(ecto_schema, field) do
+  defp get_association_field_key(ecto_schema, field) do
     :association
     |> ecto_schema.__schema__(field)
     |> get_association_field_key()
   end
 
-  def get_association_field_key(%Ecto.Association.Has{related_key: key}), do: key
-  def get_association_field_key(%Ecto.Association.BelongsTo{owner_key: key}), do: key
-  def get_association_field_key(%Ecto.Association.ManyToMany{}), do: :not_supported_yet
+  defp get_association_field_key(%Ecto.Association.Has{related_key: key}), do: key
+  defp get_association_field_key(%Ecto.Association.BelongsTo{owner_key: key}), do: key
+  defp get_association_field_key(%Ecto.Association.ManyToMany{}), do: :not_supported_yet
 
   # Return all fields that has a belong to association type.
   #
@@ -837,15 +837,15 @@ defmodule Fictitious do
   #   iex> get_association_field_ecto_schema(Person, :name)
   #   Fictitious.Person
   #
-  def get_association_field_ecto_schema(ecto_schema, field) do
+  defp get_association_field_ecto_schema(ecto_schema, field) do
     :association
     |> ecto_schema.__schema__(field)
     |> Map.get(:related)
   end
 
   # Check whether an input struct in an encto belongs to struct.
-  def is_belongs_to_association?(%Ecto.Association.BelongsTo{}), do: true
-  def is_belongs_to_association?(_), do: false
+  defp is_belongs_to_association?(%Ecto.Association.BelongsTo{}), do: true
+  defp is_belongs_to_association?(_), do: false
 
   ###################################
   #        RANDOM GENERATORS        #
