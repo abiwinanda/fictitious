@@ -25,4 +25,5 @@ fictitious-*.tar
 # Ignore .elixir_ls
 /.elixir_ls/
 
+/env
 env.sh

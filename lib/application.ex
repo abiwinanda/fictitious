@@ -4,7 +4,7 @@ defmodule Fictitious.Application do
 
   def start(_type, _args) do
     # List all child processes to be supervised
-    children = Application.get_env(:fictitious, :children)
+    children = [Fictitious.Repo]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

@@ -1,7 +1,7 @@
 defmodule Fictitious.MixProject do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "0.2.0"
 
   def project do
     [
@@ -13,6 +13,7 @@ defmodule Fictitious.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
+      aliases: aliases(),
       name: "Fictitious",
       source_url: "https://github.com/abiwinanda/fictitious",
       docs: docs()
@@ -21,10 +22,16 @@ defmodule Fictitious.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      # mod: {Fictitious.Application, []},
-      extra_applications: [:logger]
-    ]
+    if Mix.env() in [:test, :dev] do
+      [
+        mod: {Fictitious.Application, []},
+        extra_applications: [:logger]
+      ]
+    else
+      [
+        extra_applications: [:logger]
+      ]
+    end
   end
 
   # Run "mix help deps" to learn about dependencies.
@@ -32,10 +39,18 @@ defmodule Fictitious.MixProject do
     [
       {:ecto, "~> 3.1"},
       {:ksuid, "~> 0.1.2"},
-      {:ecto_sql, "~> 3.1"},
-      {:postgrex, "~> 0.15.1"},
       {:misc_random, "~> 0.2.9"},
-      {:ex_doc, "~> 0.22.0", only: :dev, runtime: false}
+      {:ecto_sql, "~> 3.1", only: [:test, :dev]},
+      {:postgrex, "~> 0.15.1", only: [:test, :dev]},
+      {:ex_doc, "~> 0.22.0", only: [:test, :dev], runtime: false}
+    ]
+  end
+
+  defp aliases do
+    [
+      "ecto.setup": ["ecto.create", "ecto.migrate"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 
