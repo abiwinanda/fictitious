@@ -67,6 +67,7 @@ defmodule Fictitious.MixProject do
         "mix.exs",
         "LICENSE.md",
         "README.md",
+        "CHANGELOG.md",
         ".formatter.exs"
       ],
       licenses: ["MIT"],
