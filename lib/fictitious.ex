@@ -313,7 +313,6 @@ defmodule Fictitious do
     end
   end
 
-  @doc false
   def fictionize(%Ecto.Association.BelongsTo{
         related: belongs_to_ecto_schema,
         owner: owner_ecto_schema
@@ -341,7 +340,6 @@ defmodule Fictitious do
     end
   end
 
-  @doc false
   def fictionize(
         %Ecto.Association.BelongsTo{
           related: belongs_to_ecto_schema,
