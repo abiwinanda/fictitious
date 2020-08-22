@@ -1,6 +1,7 @@
 import Config
 
-config :fictitious, :children, [Fictitious.Repo]
+# Print only warnings and errors during test
+config :logger, level: :warn
 
 config :fictitious,
   ecto_repos: [Fictitious.Repo]
