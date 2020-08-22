@@ -77,6 +77,7 @@ defmodule Fictitious.MixProject do
   defp docs do
     [
       main: Fictitious,
+      extras: ["CHANGELOG.md"],
       source_ref: "v#{@version}",
       source_url: "https://github.com/abiwinanda/fictitious"
     ]
