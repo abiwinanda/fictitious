@@ -44,6 +44,17 @@ defmodule FictitiousTest do
     person = Fictitious.Repo.preload(person, :nationality)
     assert person.nationality.id == country.id
   end
+  
+  test "Fictitious can overwrite the specified field by passing the parent struct. Testing with the same parent struct." do
+    {:ok, country} = Fictitious.fictionize(Country, name: "Indonesia")
+    {:ok, parent} = Fictitious.fictionize(Person, name: "John", nationality: country)
+    {:ok, child} = Fictitious.fictionize(Person, name: "Marry", nationality: country, parent: parent)
+    parent = Fictitious.Repo.preload(parent, [:nationality])
+    child = Fictitious.Repo.preload(child, [:parent, :nationality])
+    assert parent.nationality.id == country.id
+    assert child.nationality.id == country.id
+    assert parent.id == child.parent.id
+  end
 
   test "Fictitious can be configured to use more than one repo." do
     {:ok, country_1} = Fictitious.fictionize(Country, :second_repo)

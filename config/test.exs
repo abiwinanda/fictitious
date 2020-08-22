@@ -10,6 +10,7 @@ config :fictitious, Fictitious.Repo,
   password: System.get_env("FICTITIOUS_PASSWORD_TEST"),
   database: System.get_env("FICTITIOUS_DATABASE_TEST"),
   hostname: System.get_env("FICTITIOUS_HOSTNAME_TEST"),
+  port: System.get_env("FICTITIOUS_PORT_TEST", "5432"),
   pool: Ecto.Adapters.SQL.Sandbox
 
 config :fictitious, :repo,
