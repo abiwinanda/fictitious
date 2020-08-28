@@ -601,8 +601,7 @@ defmodule Fictitious do
         |> detupelize()
         |> Map.get(
           ecto_schema
-          |> get_association_field_ecto_schema(field)
-          |> get_primary_key_field()
+          |> get_related_field_ecto_schema(field)
         )
       )
     end)
@@ -620,8 +619,7 @@ defmodule Fictitious do
         |> detupelize()
         |> Map.get(
           ecto_schema
-          |> get_association_field_ecto_schema(field)
-          |> get_primary_key_field()
+          |> get_related_field_ecto_schema(field)
         )
       )
     end)
@@ -678,8 +676,7 @@ defmodule Fictitious do
         |> detupelize()
         |> Map.get(
           ecto_schema
-          |> get_association_field_ecto_schema(field)
-          |> get_primary_key_field()
+          |> get_related_field_ecto_schema(field)
         )
 
       true ->
@@ -746,8 +743,7 @@ defmodule Fictitious do
         |> detupelize()
         |> Map.get(
           ecto_schema
-          |> get_association_field_ecto_schema(field)
-          |> get_primary_key_field()
+          |> get_related_field_ecto_schema(field)
         )
 
       true ->
@@ -881,7 +877,7 @@ defmodule Fictitious do
     |> get_association_field_key()
   end
 
-  defp get_association_field_key(%Ecto.Association.Has{related_key: key}), do: key
+  defp get_association_field_key(%Ecto.Association.Has{}), do: :not_supported_yet
   defp get_association_field_key(%Ecto.Association.BelongsTo{owner_key: key}), do: key
   defp get_association_field_key(%Ecto.Association.ManyToMany{}), do: :not_supported_yet
 
@@ -899,6 +895,22 @@ defmodule Fictitious do
     :association
     |> ecto_schema.__schema__(field)
     |> Map.get(:related)
+  end
+
+  # Return rekated fields that has a belong to association type.
+  #
+  # Examples:
+  #
+  #   iex> get_related_field_ecto_schema(Person, :nationality)
+  #   :id
+  #
+  #   iex> get_related_field_ecto_schema(SocialMediaInformation, :email)
+  #   :email
+  #
+  defp get_related_field_ecto_schema(ecto_schema, field) do
+    :association
+    |> ecto_schema.__schema__(field)
+    |> Map.get(:related_key)
   end
 
   # Check whether an input struct in an encto belongs to struct.
