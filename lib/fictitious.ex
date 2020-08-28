@@ -897,7 +897,7 @@ defmodule Fictitious do
     |> Map.get(:related)
   end
 
-  # Return rekated fields that has a belong to association type.
+  # Return related fields that has a belong to association type.
   #
   # Examples:
   #
