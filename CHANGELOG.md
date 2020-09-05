@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+* Support belongs to association where the child entity does not reference to parent entity through primary key.
+
 ## 0.2.0
 
 * Support self-referencing schema. Fix bug where self-referencing schema causes fictitious to end up in infinite loop.
