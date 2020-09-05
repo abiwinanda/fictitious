@@ -1,6 +1,6 @@
 defmodule FictitiousTest do
   use ExUnit.Case, async: true
-  alias Fictitious.{Country, Person}
+  alias Fictitious.{Country, Person, SocialMediaInformation}
 
   setup do
     # Explicitly get a connection before each test
@@ -29,6 +29,7 @@ defmodule FictitiousTest do
     {:ok, person} = Fictitious.fictionize(Person)
     person = Fictitious.Repo.preload(person, :nationality)
     assert not is_nil(person.nationality)
+    assert not is_nil(person.email)
   end
 
   test "Fictitious can overwrite the specified belongs to field by passing an id." do
@@ -79,5 +80,12 @@ defmodule FictitiousTest do
   test "Fictitious can give null value to a belongs to association field key." do
     {:ok, person} = Fictitious.fictionize(Person, parent_id: :null)
     assert is_nil(person.parent_id)
+  end
+  
+  test "Fictitious Fictitious does generate the belongs_to associations from non primary key field." do
+    {:ok, social_media_info} = Fictitious.fictionize(SocialMediaInformation)
+    social_media_info = Fictitious.Repo.preload(social_media_info, :user)
+    assert not is_nil(social_media_info.user)
+    assert social_media_info.user.email == social_media_info.email
   end
 end

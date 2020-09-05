@@ -12,6 +12,8 @@ defmodule Fictitious.Person do
     belongs_to :nationality, Country, references: :id, foreign_key: :country_id, type: :id
     belongs_to :parent, Person, references: :id, foreign_key: :parent_id, type: :id
 
+    has_one :social_media_information, SocialMediaInformation, foreign_key: :email
+
     timestamps()
   end
 
