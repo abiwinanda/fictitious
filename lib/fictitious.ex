@@ -880,6 +880,7 @@ defmodule Fictitious do
   defp get_association_field_key(%Ecto.Association.Has{}), do: :not_supported_yet
   defp get_association_field_key(%Ecto.Association.BelongsTo{owner_key: key}), do: key
   defp get_association_field_key(%Ecto.Association.ManyToMany{}), do: :not_supported_yet
+  defp get_association_field_key(_), do: :not_supported_yet
 
   # Return all fields that has a belong to association type.
   #
