@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-      - '\d{0,3}\.\d{0,3}\.\d{0,3}'
+      - '*'
 
 jobs:
   publish:
