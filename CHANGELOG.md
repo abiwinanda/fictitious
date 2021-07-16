@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+* Fix unknow association from ecto causes error.
+
 ## 0.2.1
 
 * Support belongs to association where the child entity does not reference to parent entity through primary key.
